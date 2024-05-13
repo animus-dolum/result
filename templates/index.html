@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Game of life</title>
+
+        <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+        <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+
+        <py-env>
+            - matplotlib
+            - numpy
+        </py-env>
+    </head>
+
+    <body>
+        <style>
+            .grid {
+                display: inline-grid;
+                grid-template-columns: repeat(25, 20px);
+            }
+            .cell {
+                width: 20px;
+                height: 20px;
+                border: 1px solid #ccc;
+                box-sizing: border-box;
+            }
+            .type1 {
+                background: blue;
+            }
+            .type2 {
+                background: red;
+            }
+        </style>
+
+        <div class="alert alert-primary" role="alert">
+             <div class="container-fluid text-center">
+                  <div class="row">
+                      <div class="col-8">
+                          <h3>Если вы не зарегестрированы на сайте, то нажмите на кнопку "Регистрация"</h3>
+                      </div>
+                      <div class="col-4">
+                          <nav class="navbar navbar-light bg-light">
+                              <div class="container-fluid">
+                                  <a class="navbar-brand" href="/reg_form">Регистрация</a>
+                              </div>
+                          </nav>
+                          <nav class="navbar navbar-light bg-light">
+                              <div class="container-fluid">
+                                  <a class="navbar-brand" href="/login">Войти</a>
+                              </div>
+                          </nav>
+                      </div>
+                  </div>
+             </div>
+        </div>
+
+        <div id="grid" class="grid"></div>
+        <form>
+            <input type="radio" id="type1" value="type1" name="type"><label for="type1" class="light">type 1</label><br>
+            <input type="radio" id="type2" value="type2" name="type"><label for="type2" class="light">type 2</label>
+        </form>
+        <button id="next">Next Generation</button>
+        <p>На данный момент особей: </p>
+        <script>
+            const gridSide = 25;
+
+            let gridType1 = new Array(gridSide);
+            let gridType2 = new Array(gridSide);
+
+            for (let i = 0; i < gridSide; i++) {
+                gridType1[i] = new Array(gridSide).fill(false);
+            }
+            for (let i = 0; i < gridSide; i++) {
+                gridType2[i] = new Array(gridSide).fill(false);
+            }
+
+            let currentType = 'type1';
+
+            function drawGrid() {
+                const gridContainer = document.getElementById('grid');
+                gridContainer.innerHTML = '';
+                for (let y = 0; y < gridSide; y++) {
+                    for (let x = 0; x < gridSide; x++) {
+                        const cell = document.createElement('div');
+                        cell.addEventListener('click', () => toggleCell(x, y));
+                        cell.className = 'cell' + (gridType1[y][x] ? ' type1' : '') + (gridType2[y][x] ? ' type2' : '');
+                        cell.onclick = () => {
+                            if (currentType === 'type1') {
+                                gridType1[y][x] = !gridType1[y][x];
+                            } else if (currentType === 'type2') {
+                                gridType2[y][x] = !gridType2[y][x];
+                            }
+                            drawGrid();
+                        };
+                        gridContainer.appendChild(cell);
+                    }
+                }
+            }
+
+            function nextGeneration() {
+                let newGridType1 = new Array(gridSide);
+                for (let i = 0; i < gridSide; i++) {
+                    newGridType1[i] = new Array(gridSide).fill(false);
+                }
+                let newGridType2 = new Array(gridSide);
+                for (let i = 0; i < gridSide; i++) {
+                    newGridType2[i] = new Array(gridSide).fill(false);
+                }
+
+                for (let y = 0; y < gridSide; y++) {
+                    for (let x = 0; x < gridSide; x++) {
+                        let neighborsType1 = 0;
+                        for (let dy = -1; dy <= 1; dy++) {
+                            for (let dx = -1; dx <= 1; dx++) {
+                                if (dx === 0 && dy === 0) continue;
+                                const ny = y + dy;
+                                const nx = x + dx;
+                                if (ny >= 0 && ny < gridSide && nx >= 0 && nx < gridSide && gridType1[ny][nx]) {
+                                    neighborsType1++;
+                                }
+                            }
+                        }
+
+                        let neighborsType2 = 0;
+                        for (let dy = -1; dy <= 1; dy++) {
+                            for (let dx = -1; dx <= 1; dx++) {
+                                if (dx === 0 && dy === 0) continue;
+                                const ny = y + dy;
+                                const nx = x + dx;
+                                if (ny >= 0 && ny < gridSide && nx >= 0 && nx < gridSide && gridType2[ny][nx]) {
+                                    neighborsType2++;
+                                }
+                            }
+                        }
+
+                        const type1 = gridType1[y][x];
+                        if (type1 && (neighborsType1 === 2 || neighborsType1 === 3)) {
+                            newGridType1[y][x] = true;
+                        } else if (!type1 && neighborsType1 === 3) {
+                            newGridType1[y][x] = true;
+                        }
+                        const type2 = gridType2[y][x];
+                        if (type2 && (neighborsType2 === 2 || neighborsType2 === 3)) {
+                            newGridType2[y][x] = true;
+                        } else if (!type2 && neighborsType2 === 3) {
+                            newGridType2[y][x] = true;
+                        }
+                    }
+                }
+
+                gridType1 = newGridType1;
+                gridType2 = newGridType2;
+                drawGrid();
+            }
+
+            document.getElementById('next').onclick = nextGeneration;
+
+            document.getElementById('type1').onclick = () => {
+                currentType = 'type1';
+            };
+
+            document.getElementById('type2').onclick = () => {
+                currentType = 'type2';
+            };
+
+            drawGrid();
+        </script>
+
+
+        <h1> Plotting a graph </h1>
+        <div id="lineplot"> </div>
+
+        <img id="matplotlib-img" alt="Matplotlib Image">
+
+        <py-script>
+            import matplotlib.pyplot as plt
+            import numpy as np
+            import io
+            import base64
+
+            # Создаем данные для графика
+            x = np.linspace(0, 10, 100)
+            y = np.sin(x)
+
+            # Строим график
+            plt.figure()
+            plt.plot(x, y)
+            plt.title('График sin(x)')
+            plt.xlabel('X')
+            plt.ylabel('Y')
+
+            # Сохраняем график в PNG файл
+            buf = io.BytesIO()
+            plt.savefig(buf, format='png')
+            plt.close()
+
+            # Кодируем изображение в base64 и выводим в элемент img
+            data_uri = base64.b64encode(buf.getvalue()).decode('utf-8')
+            img_src = f'data:image/png;base64,{data_uri}'
+            document.getElementById('matplotlib-img').src = img_src
+
+        </py-script>
+    </body>
+</html>
