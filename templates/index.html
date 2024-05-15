@@ -1,21 +1,6 @@
-<!DOCTYPE html>
-<html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
 
-        <title>Game of life</title>
-
-        <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
-        <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
-
-        <py-env>
-            - matplotlib
-            - numpy
-        </py-env>
-    </head>
-
-    <body>
+{% block content %}
         <style>
             .grid {
                 display: inline-grid;
@@ -35,35 +20,12 @@
             }
         </style>
 
-        <div class="alert alert-primary" role="alert">
-             <div class="container-fluid text-center">
-                  <div class="row">
-                      <div class="col-8">
-                          <h3>Если вы не зарегестрированы на сайте, то нажмите на кнопку "Регистрация"</h3>
-                      </div>
-                      <div class="col-4">
-                          <nav class="navbar navbar-light bg-light">
-                              <div class="container-fluid">
-                                  <a class="navbar-brand" href="/reg_form">Регистрация</a>
-                              </div>
-                          </nav>
-                          <nav class="navbar navbar-light bg-light">
-                              <div class="container-fluid">
-                                  <a class="navbar-brand" href="/login">Войти</a>
-                              </div>
-                          </nav>
-                      </div>
-                  </div>
-             </div>
-        </div>
-
         <div id="grid" class="grid"></div>
         <form>
-            <input type="radio" id="type1" value="type1" name="type"><label for="type1" class="light">type 1</label><br>
+            <input type="radio" id="type1" value="type1" name="type" checked><label for="type1" class="light">type 1</label><br>
             <input type="radio" id="type2" value="type2" name="type"><label for="type2" class="light">type 2</label>
         </form>
         <button id="next">Next Generation</button>
-        <p>На данный момент особей: </p>
         <script>
             const gridSide = 25;
 
@@ -169,39 +131,4 @@
             drawGrid();
         </script>
 
-
-        <h1> Plotting a graph </h1>
-        <div id="lineplot"> </div>
-
-        <img id="matplotlib-img" alt="Matplotlib Image">
-
-        <py-script>
-            import matplotlib.pyplot as plt
-            import numpy as np
-            import io
-            import base64
-
-            # Создаем данные для графика
-            x = np.linspace(0, 10, 100)
-            y = np.sin(x)
-
-            # Строим график
-            plt.figure()
-            plt.plot(x, y)
-            plt.title('График sin(x)')
-            plt.xlabel('X')
-            plt.ylabel('Y')
-
-            # Сохраняем график в PNG файл
-            buf = io.BytesIO()
-            plt.savefig(buf, format='png')
-            plt.close()
-
-            # Кодируем изображение в base64 и выводим в элемент img
-            data_uri = base64.b64encode(buf.getvalue()).decode('utf-8')
-            img_src = f'data:image/png;base64,{data_uri}'
-            document.getElementById('matplotlib-img').src = img_src
-
-        </py-script>
-    </body>
-</html>
+{% endblock %}

@@ -1,26 +1,28 @@
-from flask import Flask, request, render_template, make_response, jsonify, redirect
-from flask_restful import reqparse, abort, Api, Resource
-from data import db_session, weather_api
+from flask import Flask, render_template, redirect
+from data import db_session
 from data.users import User
 from forms.forms import RegisterForm, LoginForm
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from flask_restful import reqparse, abort, Api, Resource
+from flask_login import LoginManager, login_user, login_required, logout_user
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-# login_manager = LoginManager()
-# login_manager.init_app(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
 
+
+@login_manager.user_loader
+def load_user(user_id):
+    db_sess = db_session.create_session()
+    return db_sess.get(User, user_id)
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    with open('templates/index.html', 'r', encoding='utf-8') as stream:
-        return stream.read()
+    return render_template('index.html', title='game')
 
 
-@app.route('/reg_form', methods=['POST', 'GET'])
+@app.route('/register', methods=['POST', 'GET'])
 def reg_form():
     form = RegisterForm()
     if form.validate_on_submit():
@@ -36,10 +38,7 @@ def reg_form():
         user = User(
             name=form.name.data,
             surname=form.surname.data,
-            email=form.email.data,
-            country=form.country.data,
-            city=form.city.data,
-            sex=form.sex.data
+            email=form.email.data
         )
         user.set_password(form.password.data)
         db_sess.add(user)
