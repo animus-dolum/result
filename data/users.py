@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from sqlalchemy_serializer import SerializerMixin
 from .db_session import SqlAlchemyBase
 from werkzeug.security import generate_password_hash, check_password_hash
+import bcrypt
 
 
 class User(SqlAlchemyBase, UserMixin, SerializerMixin):
@@ -22,5 +23,5 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     def set_password(plain_text_password):
         self.hashed_password = bcrypt.hashpw(plain_text_password, bcrypt.gensalt())
     
-    def check_password(plain_text_password, hashed_password):
-        return bcrypt.checkpw(plain_text_password, hashed_password)
+    def check_password(plain_text_password):
+        return bcrypt.checkpw(plain_text_password, self.hashed_password)
