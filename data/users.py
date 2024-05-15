@@ -21,7 +21,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         return f'<Colonist> {self.id} {self.surname} {self.name}'
 
     def set_password(self, plain_text_password):
-        self.hashed_password = bcrypt.hashpw(plain_text_password, bcrypt.gensalt())
+        self.hashed_password = bcrypt.hashpw(plain_text_password.encode(”utf-8”), bcrypt.gensalt())
     
     def check_password(self, plain_text_password):
-        return bcrypt.checkpw(plain_text_password, self.hashed_password)
+        return bcrypt.checkpw(plain_text_password.encode(”utf-8”), self.hashed_password)
