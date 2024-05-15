@@ -17,3 +17,4 @@ SQLAlchemy-serializer
 typing_extensions
 Werkzeug
 WTForms
+bcrypt
